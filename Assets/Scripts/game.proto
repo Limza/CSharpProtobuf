@@ -1,0 +1,1939 @@
+package Network.packet;
+
+
+option java_outer_classname = "Game";
+
+
+message SResponse {
+	required int32 packetId = 1;
+	optional string json = 2;
+	optional bytes dataBytes = 3;
+}
+
+message CError {
+	required string error = 1;
+	optional string trace = 2;
+}
+
+message CKeepAlive {
+	optional bool refreshSocialAct = 1;
+	optional bool refreshCashBalance = 2;
+	repeated string compensationId = 3;
+}
+
+message CLoadData {
+	required int32 storeKey = 1;
+	repeated string friendId = 2;
+	optional string os = 3;
+	optional string deviceModel = 4;
+	optional string deviceId = 5;
+	optional string phoneNum = 6;
+	optional string country = 7;
+	repeated string glExtensions = 8;
+	optional bool guest = 9;
+	optional int32 localTime = 10;
+	optional string kakaoHashedKey = 11;
+	optional string mid = 12;
+}
+
+message CReloadData {
+	required int32 storeKey = 1;
+}
+
+message CObjAdd {
+	required string invenElem = 1;
+	required int32 x = 2;
+	required int32 y = 3;
+	required int32 floor = 4;
+	required int32 flip = 5;
+	required bool inven = 6;
+	required int32 storeKey = 7;
+	optional int32 invalidDeco = 8;
+	optional string saleEventAuthKey = 9;
+	required int32 price = 10;
+	optional bool beanDepot = 11;
+	optional bool buyByCost = 12;
+	optional bool cherryShop = 13;
+	optional string costType = 14;
+}
+
+message CObjMove {
+	required int32 oid = 1;
+	required int32 x = 2;
+	required int32 y = 3;
+	required int32 floor = 4;
+	required int32 flip = 5;
+	required int32 storeKey = 6;
+	optional int32 invalidDeco = 7;
+}
+
+message CObjSell {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+	optional int32 invalidDeco = 3;
+}
+
+message CObjStore {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+	optional int32 invalidDeco = 3;
+}
+
+message CObjReplace {
+	required int32 storeOid = 1;
+	required string invenElem = 2;
+	required int32 x = 3;
+	required int32 y = 4;
+	required int32 floor = 5;
+	required int32 flip = 6;
+	required bool inven = 7;
+	required int32 storeKey = 8;
+	optional int32 invalidDeco = 9;
+	optional string saleEventAuthKey = 10;
+	required int32	price = 11;
+	optional bool beanDepot = 12;
+	optional bool buyByCost = 13;
+	optional bool cherryShop = 14;
+	optional string costType = 15;
+}
+
+message CObjExchange {
+	required int32 placedOid = 1;
+	required int32 movedOid = 2;
+	required int32 x = 3;
+	required int32 y = 4;
+	required int32 floor = 5;
+	required int32 flip = 6;
+	required int32 storeKey = 7;
+	optional int32 invalidDeco = 8;
+}
+
+message CObjBuy {
+	required string kind = 1;
+	required int32 storeKey = 2;
+	required int32 price = 3;
+	optional int32 cash = 4;
+	optional int32 cost = 5;
+	optional string reason = 6;
+}
+
+message CObjStoreAll {
+	repeated int32 oid = 1;
+	required int32 storeKey = 2;
+	optional int32 invalidDeco = 3;
+	optional bool storeWall = 4;
+	optional bool storeExtWall = 5;
+	optional bool storeTile = 6;
+	optional bool protectBean = 7;
+}
+
+message CSellInven {
+	required string invenElem = 1;
+}
+
+message CExpand {
+	required string expandId = 1;
+	required int32 storeKey = 2;
+}
+
+message COpenNewStore {
+	required string storeId = 1;
+}
+message CSaveDesignHistory {
+	required int32 storeKey = 1;
+	required int32 floor = 2;
+}
+
+message CRequestDesignHistoryData {
+	required int32 storeKey = 1;
+	required int32 floor = 2;
+}
+
+message COpenNewStoreAtOnce {
+	required string storeId = 1;
+	required int32 cash = 2;
+}
+
+message CTileSwap {
+	required int32 x1 = 1;
+	required int32 y1 = 2;
+	required int32 floor1 = 3;
+	required int32 x2 = 4;
+	required int32 y2 = 5;
+	required int32 floor2 = 6;
+	required bool exterior = 7;
+	required int32 storeKey = 8;
+}
+
+message CTileAdd {
+	required string kind = 1;
+	required int32 x = 2;
+	required int32 y = 3;
+	required int32 floor = 4;
+	required bool inven = 5;
+	required bool exterior = 6;
+	required int32 storeKey = 7;
+	optional string saleEventAuthKey = 8;
+	optional bool cherryShop = 9;
+}
+
+message CTileToSetAll {
+	required string kind = 1;
+	required int32 storeKey = 2;
+	optional string saleEventAuthKey = 3;
+	required int32 floor = 4;
+}
+
+message CTileToSetAllThirdStore {
+	required string kind = 1;
+	required int32 storeKey = 2;
+	optional string saleEventAuthKey = 3;
+	required int32 floor = 4;
+}
+
+message CTileToSetDraw {
+	required string kind = 1;
+	required int32 storeKey = 2;
+	optional string saleEventAuthKey = 3;
+	required int32 floor = 4; 
+	repeated int32 x = 6;
+	repeated int32 y = 7;
+}
+
+message CRoast {
+	required int32 oid = 1;
+	required string descId = 2;		// roast.xml element id
+	required int32 storeKey = 3;
+}
+
+message CRoastFin {
+	required int32 oid = 1;
+	required bool oneClick = 2;
+	required int32 trashBean = 3;
+	required int32 storeKey = 4;
+}
+
+message CChargedRoastHarvest {
+	required int32 oid = 1;
+	required int32 trashBean = 2;
+	required int32 storeKey = 3;
+}
+
+message CRoastFullCharge {
+	required int32 oid = 1;
+	required int32 cash = 2;
+	required int32 storeKey = 3;
+}
+
+message CChargedSideDishHarvest {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CSideDishFullCharge {
+	required int32 oid = 1;
+	required int32 cash = 2;
+	required int32 storeKey = 3;
+}
+
+message CChargingSideDishMenuChange {
+	required int32 oid = 1;
+	required string descId = 2; // sidedish.xml element id
+	required int32 storeKey = 3;
+}
+
+message CShortenDutchLiquidMake {
+	required int32 oid = 1;
+	required int32 cash = 2;
+	required int32 storeKey = 3;
+	optional bool isTutorial = 4;
+}
+message CDutchLiquidMake {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+	required int32 bean = 3;
+	required int32 water = 4;
+	optional bool isTutorial = 5;
+}
+message CDutchCoffee {
+	required int32 oid = 1;
+	required string descId = 2;		// coffee.xml element id
+	required string dutchType = 3;  
+	required int32 storeKey = 4;
+}
+message CDutchLiquidSellStart{
+	required int32 oid = 1;
+	repeated string invenElems = 2;	
+	required int32 storeKey = 3;
+}
+message CDutchLiquidSell {
+	repeated string objInfo = 1;
+	repeated int32 count = 2;
+}
+message CDutchLiquidMakeFin {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+message CDutchLiquidSellFin {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CCoffee {
+	required int32 oid = 1;
+	required string descId = 2;		// coffee.xml element id
+	required int32 storeKey = 3;
+}
+
+message CCoffeeSell {
+	repeated string objInfo = 1;
+	repeated int32 count = 2;
+}
+
+message CCoffeeFin {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CShortenCoffeeSell {
+	required int32 oid = 1;
+	required int32 cash = 2;
+	required int32 storeKey = 3;
+}
+
+message CBaristaGuideDone {
+	required string descId = 1;
+}
+
+message CBaristaTestProgress {
+	required string descId = 1;
+	required int32 testIdx = 2;
+	required int32 score = 3;
+}
+
+message CBaristaTestQuit {
+}
+
+message CBaristaTestUpgrade {
+}
+
+message CBaristaTestUpgradeByCash {
+	required string descId = 1;
+	required int32 cash = 2;
+}
+
+message CBaristaTestRetry {
+	required string descId = 1;
+	required int32 testIdx = 2;
+}
+
+message CBaristaTestStatus {
+}
+
+message CPatronOrderDone {
+	required string patronId = 1;
+	required string orderId = 2;
+	required int32 score = 3;
+}
+message CPatronOrderDoneByMachine {
+	required int32 oid = 1;
+	required string patronId = 2;
+	required string orderId = 3;
+}
+message CPatronOrderEvaluate {
+	required string patronId = 1;
+	required string orderId = 2;
+	required int32 score = 3;
+}
+
+message CGetSpecialPatronPresent {
+	required string patronId = 1;
+}
+
+message CSkipPatronEvent {
+	required string patronId = 1;
+}
+
+message CBuyPatronItem {
+	required string patronId = 1;
+	required string itemId = 2;
+}
+
+message CFulfillPatronFavor {
+	required string patronId = 1;
+}
+
+message CGetPatronPresent {
+	required string patronId = 1;
+}
+
+message CFloorAddTrash {
+	required int32 storeKey = 1;
+}
+
+message CCleanTable {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CCleanRecycle {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CCleanFloor {
+	required int32 storeKey = 1;
+}
+
+message CCleanMachine {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CCancel {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CRoastShorten {
+	required int32 oid = 1;
+	required int32 leftSec = 2;
+	required int32 cash = 3;
+	required int32 storeKey = 4;
+}
+
+message CRoastRevive {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CStaffHire {
+	required int32 staffId = 1;
+	required string body = 2;
+	required string name = 3;
+	required int32 storeKey = 4;
+}
+
+message CStaffDressUp {
+	required int32 staffId = 1;
+	repeated string parts = 2;
+	repeated bool fromInvens = 3;
+	required string motion = 4;
+	required int32 storeKey = 5;
+	required int32 cost = 6;
+	required int32 cash = 7;
+}
+
+message CStaffBodyAndName {
+	required int32 staffId = 1;
+	required string body = 2;
+	required string name = 3;
+	required int32 storeKey = 4;
+	required bool syncMyName = 5;
+}
+
+message CStaffFullCharge {
+	required int32 staffId = 1;
+	required bool incExp = 2;
+	required int32 storeKey = 3;
+}
+
+message CStaffBoost {
+	required int32 staffId = 1;
+	required int32 storeKey = 2;
+}
+
+message CAvatarBuy {
+	required string kind = 1;
+	required int32 price = 2;
+}
+
+message CQuestStart {
+	repeated int32 questId = 1;
+	required int32 storeKey = 2;
+}
+
+message CQuestProgress {
+	required int32 questId = 1;
+	required int32 goal = 2;
+	required int32 state = 3;
+	required int32 storeKey = 4;
+	optional bool isStuck = 5;
+}
+
+message CQuestFinish {
+	required int32 questId = 1;
+	required int32 storeKey = 2;
+}
+
+message CQuestRequest {
+	required int32 questId = 1;
+	required int32 goal = 2;
+	repeated string friendId = 3;
+}
+
+message CQuestResponse {
+	required bool accept = 1;
+	required string friendId = 2;
+	required int32 questId = 3;
+	required int32 goal = 4;
+}
+
+message CQuestInstantCompletion {
+	required int32 questId = 1;
+	required int32 goal = 2;
+	required bool all = 3;
+	required int32 cash = 4;
+	required int32 currentState = 5;
+	required int32 storeKey = 6;
+	required bool isEventCashAmount = 7;
+	optional int32 petOid = 8;
+	optional string petSkillId = 9;
+}
+
+message CQuestRemoveNewFlag {
+	required int32 questId = 1;
+}
+
+message CRequestInstantCompletionByInvitee {
+	required int32 questId = 1;
+	required int32 goal = 2;
+	required string friendId = 3;
+}
+
+message CExpansionRequest {
+	required string expandId = 1;
+	repeated string friendId = 2;
+	required bool isEmilyChecked = 3;
+	required int32 storeKey = 4;
+}
+
+message CExpansionResponse {
+	required bool accept = 1;
+	required string friendId = 2;
+}
+
+message CExpansionBuyPermission {
+	required string expandId = 1;
+	required int32 storeKey = 2;
+}
+
+message CExpansionBuyAllPermission {
+	required string expandId = 1;
+	required int32 storeKey = 2;
+}
+
+message CExpansionComplete {
+	required int32 storeKey = 1;
+}
+
+message CExpansionPermissionByInvitee {
+	required string expandId = 1;
+	required string friendId = 2;
+	required int32 storeKey = 3;
+}
+
+message CChainExpansionComplete {
+	required int32 storeKey = 1;
+}
+
+message CChainExpansionShorten {
+	required int32 storeKey = 1;
+	required string expandId = 2;
+	required int32 leftSec = 3;
+	required int32 cash = 4;
+}
+
+message CCarReplace {
+	required string carId = 1;
+	required bool inven = 2;
+	optional string saleEventAuthKey = 3;
+}
+
+message CVisitFriend {
+	required string id = 1;
+	required int32 storeKey = 2;
+	required bool isNotFriendEachOther = 3;
+	optional bool imitate = 4;
+	optional int32 lastModifiedTime = 5;
+}
+
+message CVisitAction {
+	required string friendId = 1;
+	required string actionType = 2;
+	required int32 target = 3;
+}
+
+message CVisitResponse {
+	required int32 oid = 1;
+	required string fid = 2;
+	required string type = 3;
+	required int32 storeKey = 4;
+}
+
+message CVisitReviveAll {
+	required string fid = 1;
+	repeated int32 oids = 2;
+	optional bool pfMsgBlocked = 3;
+}
+
+message CResponseReviveAll {
+	repeated string fids = 1;
+	repeated int32 oids = 2;
+}
+
+message CSpecialRequestForTutorial {
+	required string request = 1;
+	required int32 storeKey = 2;
+	repeated int32 oids = 3;
+}
+
+message CNpcReaction {
+	required string type = 1;
+	required int32 floor = 2;
+}
+
+message CToutingResult {
+	required bool success = 1;
+	optional string patronId = 2;
+	required bool isFinished = 3;
+}
+
+message CPatronToutingResult {
+	required bool success = 1;
+	required string patronId = 2;
+}
+
+message CPatronEventToutingResult {
+	required string itemType = 1;
+	required string itemId = 2;
+}
+
+message CCleanChair {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CFreeGiftSend {
+	required string giftId = 1;
+	repeated string friendId = 2;
+}
+
+message CFreeGiftResponse {
+	required bool accept = 1;
+	required string freindId = 2;
+	required string giftId = 3;
+}
+
+message CNPCGiftSend {
+	required string eventId = 1;
+	required string npcId = 2;
+}
+
+message CIncDailyLimit {
+	required string limitId = 1;
+}
+
+message CIncWeeklyLimit {
+	required string limitId = 1;
+}
+
+message CTryExpire {
+	required string id = 1;
+	required string type = 2;
+	required int32 storeKey = 3;
+	required string changeItemElem = 4;
+}
+
+message CGetDailyReward {
+}
+
+message CSellSideDishStart {
+	required int32 oid = 1;
+	required string sideDishId = 2;
+	required int32 storeKey = 3;
+}
+
+message CSideDishSell {
+	repeated string objInfo = 1;
+	repeated int32 count = 2;
+}
+
+message CSellSideDishFin {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CSellSideDishShorten {
+	required int32 oid = 1;
+	required int32 cash = 2;
+	required int32 storeKey = 3;
+}
+
+message CBuyCashBean {
+	required string id = 1;
+	required int32 count = 2;
+	optional int32 bean = 3;
+	optional int32 cash = 4;
+}
+
+message CBuyCashRoastTicket {
+	required string id = 1;
+	required int32 count = 2;
+	required int32 cash = 3;
+}
+
+message CBuyBackground {
+	required string id = 1;
+	required string type = 2;
+	required int32 storeKey = 3;
+	required int32 price = 4;
+	optional bool cherryShop = 5;
+}
+
+message CChangeBackground {
+	required bool reset = 1;
+	required string id = 2;
+	required string type = 3;
+	required int32 storeKey = 4;
+}
+
+message CChangeSecondFloorBackground {
+	required int32 storeKey = 1;
+	optional string bgId = 2;
+}
+
+message CUnlockBean {
+	required string id = 1;
+}
+
+message CUnlockCoffee {
+	required string id = 1;
+}
+
+message CUnlockSideDish {
+	required string id = 1;
+}
+
+message CExpandAtOnce {
+	required string id = 1;
+	required int32 cash = 2;
+	required int32 storeKey = 3;
+}
+
+message SGiftBoxLoaded {
+	required string json = 1;
+}
+
+message CGiftReceive {
+	required string id = 1;
+}
+
+message CReloadGiftBox {
+}
+
+message CGiftReceiveMultiple {
+	repeated string ids = 1;
+}
+
+message CWriteLog {
+	required string logMsg = 1;
+}
+
+message CUseCoupon {
+	required string id = 1;
+}
+
+message SUseCouponResult {
+	required bool success = 1;
+	optional string failResult = 2;
+}
+
+message CLovelyGiftSend {
+	required string giftId = 1;
+	required string friendId = 2;
+	required int32 count = 3;
+	required string senderName = 4;
+	optional string message = 5;
+	optional string eventType = 6;
+}
+
+// mobile specific from here
+// for the purpose of easy merging
+
+message CMakeSideDishStart {
+	required int32 oid = 1;
+	required string descId = 2;
+	required int32 storeKey = 3;
+}
+
+message CMakeSideDishFin {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CMakeSideDishShorten {
+	required int32 oid = 1;
+	required int32 leftSec = 2;
+	required int32 cash = 3;
+	required int32 storeKey = 4;
+}
+
+message CMakeSideDishRevive {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CMakeFortuneCookieStart {
+	required int32 oid = 1;
+	required string descId = 2;
+	required int32 storeKey = 3;
+	required string paymentType = 4;
+}
+
+message CMakeFortuneCookieFin {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CPatronToutInstantCompletion {
+	required string patronId = 1;
+}
+
+message CPatronToutInstantCall {
+	required string patronId = 1;
+}
+
+message CTalkPatron {
+	required string patronId = 1;
+}
+
+message CSpecialTalkPatronResult {
+	required string patronId = 1;
+	required bool success = 2;
+}
+
+message CRefreshDataAfterLevelUp {
+	required int32 storeKey = 1;
+}
+
+message CGetRecycleTip {
+}
+
+message CResponseAllQuestAndExpansion {
+}
+
+message CGetTranxId {
+	required string descId = 1;
+	required string market = 2;
+	optional int32 bonusRate = 3;
+}
+
+message CInAppPurchaseResult {
+	required string market = 1;
+	required string arg0 = 2;
+	required string arg1 = 3;
+	optional int32 billingVersion = 4;
+	optional string packageName = 5;
+	optional int32 bonusRate = 6;
+}
+
+message CGetDanalServerInfo {
+	required string descId = 1;
+	required string info = 2;
+}
+
+message CDanalResendOTP {
+	required string serverInfo = 1;
+}
+
+message CDanalSimBill {
+	required string serverInfo = 1;
+	required string otp = 2;
+}
+
+message CDanalReBillWP {
+	required string descId = 1;
+	required string info = 2;
+}
+
+message CDanalDelAuthKey {
+	required string authKey= 1;
+}
+
+message CForceInAppPurchaseResult {
+	required string txId = 1;
+	required string itemId = 2;
+	required string arg0 = 3;
+	required bool onlyCheckReceipt = 4;
+	optional int32 bonusRate = 5;
+}
+
+message SPurchaseConfirmed {
+	required string transactionId = 1;
+}
+
+message SDanalResultReceived {
+	required string json = 1;
+}
+
+message CGetFriendInfo {
+	repeated string friendId = 1;
+}
+
+message CInviteSMS {
+	required string phoneNo = 1;
+	required string name = 2;
+}
+
+message CInviteFriend {
+	required string friendId = 1;
+	optional string phoneNo = 2;
+}
+
+message CInviteDormant {
+	required string friendId = 1;
+	optional bool pfMsgBlocked = 2;
+}
+
+message CInviteComeBack {
+	required string friendId = 1;
+	optional bool pfMsgBlocked = 2;
+}
+
+message CInviteComeBackCompleteCount {
+	
+}
+
+message CGetAllWritings {
+	required int32 lastRefresh = 1;
+}
+
+message CPushWriting {
+	required string guestBookId = 1;
+	required string myId = 2;
+	required string message = 3;
+	required bool isSecret = 4;
+	required int32 lastRefresh = 5;
+	required int32 lv = 6;
+}
+
+message CPushComment {
+	required string writerId = 1;
+	required int32 timestamp = 2;
+	required string comment = 3;
+	required int32 lastRefresh = 4;
+}
+
+message CGuestBookSetTitle {
+	required string title = 1;
+	required int32 lastRefresh = 2;
+}
+
+message CGuestBookSetAllSecret {
+	required bool allSecret = 1;
+}
+
+message CRemoveWriting {
+	required string guestBookId = 1;
+	required string writerId = 2;
+	required int32 timestamp = 3;
+	required int32 lastRefresh = 4;
+}
+
+message CRemoveComment {
+	required string writerId = 1;
+	required int32 timestamp = 2;
+	required int32 lastRefresh = 3;
+}
+
+message CModifyWriting {
+	required string guestBookId = 1;
+	required string writerId = 2;
+	required int32 timestamp = 3;
+	required string writing = 4;
+	required int32 lastRefresh = 5;
+}
+
+message CModifyComment {
+	required string writerId = 1;
+	required int32 timestamp = 2;
+	required string comment = 3;
+	required int32 lastRefresh = 4;
+}
+
+message CJoinedGame {
+	required string phoneNo = 1;
+}
+
+message CUnregisterGame {
+}
+
+message CGetCashInfo {
+}
+
+message CMigrateGuestToKakao {
+	required string uid = 1;
+	required string email = 2;
+	required string nickname = 3;
+}
+
+message CInducedAction {
+	required string id = 1;
+}
+
+message CRetryTout {
+	required string id = 1;
+}
+
+message CInviteKakaoEvent {
+	required int32 count = 1;
+}
+
+message CObjDecoUp {
+	required int32 oid = 1;
+	required string method = 2;
+	required bool isInvalid = 3;
+	required int32 storeKey = 4;
+}
+
+message CBuyAll {
+	required string buyList = 1;
+	required string ignoreList = 2;
+	required string moveList = 3;
+	repeated bool isImitateTiles = 4;
+	required int32 cash = 5;
+	required int32 cost = 6;
+	required int32 invalidDeco = 7;
+	required int32 storeKey = 8;
+	required int32 floor = 9;
+}
+
+message CRevertDesign {
+	required string buyList = 1;
+	required string ignoreList = 2;
+	required string moveList = 3;
+	repeated bool isImitateTiles = 4;
+	required int32 cash = 5;
+	required int32 cost = 6;
+	required int32 invalidDeco = 7;
+	required int32 storeKey = 8;
+	required int32 floor = 9;
+}
+
+message CCashTreeHarvest {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+message CRoastTicketHarvest {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CCashTreePushEnable {
+	required bool enable = 1;
+}
+
+message CCherryTreeHelp {
+	required int32 oid = 1;
+	required string uid = 2;
+	required string fid = 3;
+}
+
+message CCherryTreeHelpList {
+	required string uid = 1;
+}
+
+message CCherryTreeHarvest {
+	required string actionType = 2;
+}
+
+message CCherryTreeInitHelp {
+	required string uid = 2;
+}
+
+message CExistCherryTreeInven {
+	required string fid = 1;
+}
+
+message CPurchaseGold {
+	required string id = 1;
+}
+
+message CAutoCoffeeMachineStart {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+	repeated string descId = 3;
+	repeated int32 count = 4;
+}
+
+message CAutoCoffeeMachineFin {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CAutoCoffeeMachineShorten {
+	required int32 oid = 1;
+	required int32 cash = 2;
+	required int32 storeKey = 3;
+}
+
+message CCoffeeFinAuto {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+	repeated string fids = 3;
+}
+
+message CConfirmExpiredSaleEvent {
+}
+
+message CSendClover{
+	required string uid = 1;
+}
+
+message CGetCloverReward{
+}
+
+message CBuyPointItem{
+	required string shopId = 1;
+	required string itemId = 2;
+}
+
+message CBuyShopPoint{
+	required string shopId = 1;
+	required string itemId = 2;
+}
+
+message CConfirmRefreshChargeEvent {
+}
+
+message CChangeRandomFriendConfig{
+	required bool useRandomFriend = 1;
+}
+
+message CChangeRandomFriendName{
+	required string name = 1;
+}
+
+message CHideRandomFriendFollower{
+	required string fid = 1;
+}
+
+message CRemoveHideFollower{
+	required string uid = 1;
+	repeated string removeList = 2;
+}
+
+message CGetHideRandomFriendFollower{
+	required string fid = 2;
+}
+
+message CBuyLuckyBox{
+	required string id = 1;
+	required int32 count = 2;
+	optional bool isCost2 = 3;
+	required int32 price = 4;
+}
+
+message COpenLuckyBox{
+	required string id = 1;
+	optional string magCouponId = 2;
+}
+
+message CBuyPackageBox{
+	required string id = 1;
+	required int32 cash = 2;
+	repeated string itemIds = 3;
+	repeated int32 itemCounts = 4;
+}
+
+message COpenPackageBox{
+	required string id = 1;
+	repeated string itemIds = 2;
+	repeated int32 itemCounts = 3;
+	required int32 expire= 4;
+}
+
+message CBuyItemCoupon {
+	required string id = 1;
+	required int32 count = 2;
+	required int32 price = 3;
+}
+
+message CUseItemCoupon {
+	required string couponId = 1;
+}
+
+message CBuyNPCGift{
+	required string eventId = 1;
+	required int32 itemCount = 2;
+}
+
+message CSubmitSurvey{
+	required string id = 1;
+	repeated int32 answer = 2;
+}
+
+message CSubmitSurveyTest{
+	required string id = 1;
+	required bool finalSubmit = 2;
+	repeated int32 answer = 3;
+}
+
+message CResetSurveyTest{
+	required string id = 1;
+}
+
+message CSendEventGift {
+	required string eventName = 1;
+	repeated string fids = 2;
+}
+
+message SEventUpdated {
+}
+
+message CReduceEvent {
+}
+
+message CStampEvent{
+	required string eventId = 1;
+	required string goalId = 2;
+	optional int32 contribution = 3;
+	optional int32 tip = 4;
+	optional string itemId = 5;
+}
+
+message CStampEventClaimReward {
+}
+
+message CStampEventCashStamp {
+	required string eventId = 1;
+}
+
+message CInviteKakaoEventSend {
+	required string eventId = 1;
+	required string myKey = 2;
+	repeated string friendIds = 3;
+	repeated string friendKeys = 4;
+}
+
+message CInviteKakaoEventThanks {
+	required string eventId = 1;
+	required string myKey = 2;
+	required string friendKey = 3;
+}
+
+message CReportFriendsCount{
+	required int32 fr = 1;
+	required int32 aFr = 2;
+	required int32 rf = 3;
+	required int32 aRf = 4;
+}
+
+message CChangeItemColor{
+	repeated string storeItem = 1;
+	repeated string invenItem = 2;
+}
+
+message CDevCommand{
+	required string cmd = 1;
+}
+
+message SPopupMessage{
+	required string message = 1;
+}
+
+message CUpdateSleepSettings{
+	required string sleepSettings = 1;
+}
+
+message COpenSpecialBox{
+	required string boxId = 1;
+	required string itemId = 2;
+	required string expire= 3;
+}
+
+message CChangeCafeTitle{
+	required string title = 1;
+}
+
+message CChangeFirstVisitStore{
+	required int32 storeKey = 1;
+}
+
+message CHarvestAllWorkObj{
+	required int32 storeKey = 1;
+	optional int32 workFloor = 2;
+}
+
+message CInvenObjChangeColor{
+	required string destItemId = 1;
+	required string newItemId = 2;
+	required bool useCoupon = 3;
+}
+
+message CObjChangeColor {
+	required int32 oid = 1;
+	required string destItemId = 2;
+	required int32 x = 3;
+	required int32 y = 4;
+	required int32 floor = 5;
+	required int32 flip = 6;
+	required int32 storeKey = 7;
+	required string useCoupon = 8;
+	optional int32 invalidDeco = 9;
+}
+
+message CCarChangeColor {
+	required string carId = 1;
+	required string useCoupon = 2;
+}
+
+message CObjExtensionPeriod {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CMixItem{
+	required int32 oid = 1;
+	repeated string invenElems = 2;	
+	required int32 storeKey = 3;
+}
+
+message CMixItemFin{
+	required int32 oid = 1;;
+	required int32 storeKey = 2;
+}
+
+message CMixItemShorten{
+	required int32 oid = 1;;
+	required int32 cash = 2;
+	required int32 storeKey = 3;
+}
+
+message CIsItemMixerWorking{
+	required int32 storeKey = 1;
+}
+
+message CIncBeanLevel{
+	required string beanId = 1;
+	required int32 cash = 2;
+	optional string itemId = 3;
+}
+
+message CObjBuyTwoPlusOne{
+	required string kind = 1;
+}
+
+message CExpandSecondFloor {
+	required int32 storeKey = 1;
+	required string expandId = 2;
+	required bool useCash = 3;
+	required int32 price = 4;
+}
+
+message CExpandThirdStore {
+	required bool useCash = 1;
+}
+
+message CExpandThirdStoreInstant {
+	required int32 cash = 1;
+	required int32 leftSec = 2;
+}
+
+message CExpandThirdStoreComplete {
+	
+}
+
+message CRestartThirdStore {
+	required string casher = 1;
+	required string pickup = 2;
+	required string recycle = 3;
+	required int32 necessaryShop1 = 4;
+	required int32 necessaryShop2 = 5;
+}
+message CRestartThirdStoreExpansion {
+	required int32 necessaryShop1 = 1;
+	required int32 necessaryShop2 = 2;
+	repeated int32 oid = 3;
+	optional string recycle = 4;
+}
+
+message CThirdStoreRecvExpandReward {
+	required string itemId = 1;
+}
+
+message CThirdStoreRecalcExpandReward {
+	
+}
+
+message CThirdStoreRecvRareReward {
+	required string itemId = 1;
+	required int32 itemCount = 2;
+}
+
+message CGrantNewDailyQuest {
+}
+
+message CDailyQuestProgress {
+	required int32 questId = 1;
+	required int32 goal = 2;
+	required int32 state = 3;
+	required int32 storeKey = 4;
+}
+
+message CDailyQuestFinish {
+	required int32 questId = 1;
+}
+
+message CDailyQuestInstantCompletion {
+	required int32 questId = 1;
+	required int32 goal = 2;
+	required int32 cash = 3;
+	required int32 currentState = 4;
+	required bool isEventCashAmount = 5;
+	optional int32 petOid = 8;
+	optional string petSkillId = 9;
+}
+
+message CDailyQuestGetData {
+}
+
+message CGetAchievementReward {
+	required string achievementId = 1;
+	required string goalId = 2;
+}
+
+message CProceedAchievement {
+	required string achievementId = 1;
+	optional string key = 2;
+	optional int32 count = 3;
+	optional bool isSet = 4;
+}
+
+message CHotDealBuy {
+	required string itemId = 1;
+	optional bool isSpecialItem = 2;
+}
+
+message CHotDealPoll {
+	required string eventId = 1;
+}
+
+message CGetChargeObject {
+}
+
+message CPointMissionFinish {
+	required int32 questId = 1;
+}
+
+message CPointMissionInstantCompletion{
+	required int32 questId = 1;
+	required int32 goal = 2;
+	required int32 cash = 3;
+	required int32 cv = 4;
+}
+
+message CGrantNewPointMission {
+}
+
+message CPointMissionGetPresent {
+	required int32 point = 1;
+}
+
+message CBingoMissionFinish {
+	required int32 questId = 1;
+}
+
+message CBingoMissionInstantCompletion{
+	required int32 questId = 1;
+	required int32 goal = 2;
+	required int32 cash = 3;
+	required int32 cv = 4;
+}
+
+message CGrantNewBingoMission {
+}
+
+message CBingoMissionGetPresent {
+	required int32 point = 1;
+}
+message CBingoMissionGetNumber {
+}
+message CBingoMissionQuestReset {
+}
+
+message CStoreBeanBox {
+	optional string invenElem = 1;
+	required int32 storeKey = 2;
+	required bool fromInven = 3;
+	optional int32 oid = 4;
+}
+
+message CUpgradeBeanDepot {
+	required int32 id = 1;
+	required bool useGold = 2;
+}
+
+message CEventDiceReset {
+}
+
+message CEventDiceFinish {
+	required string questId = 1;
+}
+
+message CEventDiceUseDice {
+	optional int32 num = 1;
+}
+
+message CEventDiceBuyDice {
+	required string id = 1;
+}
+
+message CEventDiceForceMoveStartPoint {
+}
+
+message CEventDiceForceMoveByGoldCard {
+	required bool foward = 1;
+	required int32 dist = 2;
+}
+
+message CEventDiceSendGift {
+	repeated string fids = 2;
+}
+
+message CEventDiceRecvGift {
+	required int32 count = 1;
+}
+
+message CEventDiceResetGift {
+	
+}
+
+message CEventDiceFirstVisit {
+	
+}
+
+message CComeBackSendGift {
+	repeated string fids = 2;
+}
+
+message CComeBackRecvGift {
+}
+
+message CEventGomCheckReward {
+	required string stageId = 1;
+}
+
+message CTarotQuestion {
+	required string genre = 1;
+	required string main = 2;
+	required string sub = 3;
+	optional string category = 4;
+	optional string questionIndex = 5;
+	optional string questionContent = 6;
+	optional bool useTicket = 7;
+}
+
+message CTarotReward {
+}
+
+message CApplyTarotSkill {
+}
+
+message CTarotBuyTicket {
+	required string id = 1;
+}
+
+message CThirdStoreGetAdditFavor {
+
+}
+
+message CThirdStoreHostDailyReward {
+	required string id = 1;
+}
+
+message CThirdStoreCompleteFavor {
+}
+
+message CThirdStoreInstantFillSalePoint {
+	required int32 cash = 1;
+}
+
+message CThirdStoreInstantFillFavor {
+	required int32 cash = 1;
+}
+
+message CAddFavoriteFriend{
+	required string frIds = 1;
+	optional bool localData = 2;
+}
+
+message CRemoveFavoriteFriend{
+	required string frId = 1;
+}
+
+message CPatronMachineCall {
+	required int32 oid = 1;
+	optional string itemId = 2;
+	optional string patronId = 3;
+}
+
+message CPatronMachineFin {
+	required int32 oid = 1;
+}
+
+message CChargeCollection{
+	required string type = 1;
+}
+
+message CReceiveChargeObj{
+	required string id = 1;
+}
+
+message CReceiveCollectionGift{
+	required string id = 1;
+	required int32 order = 2;
+	required string collectionType = 3;
+}
+
+message CReceiveLevelUpReward{
+}
+
+message COpenPointBox{
+	required string eventId = 1;
+	required int32 boxNum = 2;
+}
+
+message CBuyBoxPoint{
+	required string eventId = 1;
+	required int32 point = 2;
+}
+
+message CDevTimeSet{
+	repeated string setTime = 1;
+}
+
+message CXpReward{
+	required bool isLevelUp = 1;
+	required int32 exp = 2;
+}
+
+message CGetOnTimeBoxPoint{
+	required string eventId = 1;
+}
+
+message CPetAwake{
+	required int32 oid = 1;
+	required bool awake = 2;
+	optional string cushionId = 3;
+}
+message CPetTreat{
+	required int32 oid = 1;
+}
+message CPetCare{
+	required int32 oid = 1;
+	required string type = 2;
+}
+message CPetWithPlaying{
+	required int32 oid = 1;
+	required string type = 2;
+}
+message CPetStatusUpdate{
+	required int32 oid = 1;
+}
+message CPetPutStatusUpdate{
+	required int32 oid = 1;
+}
+message CPetUserAction{
+	required int32 oid = 1;
+	required string type = 2;
+}
+message CPetEatSnack{
+	required string oid = 1;
+	required int32 petId = 2;
+}
+message CPetRevertBeforeHp{
+	required int32 petId = 1;
+	optional string oid = 2;
+}
+message CPetReNaming{
+	required int32 oid = 1;
+	required string name = 2;
+}
+
+message CBuyPetItem{
+	required string id = 1;
+	required int32	count = 2;
+}
+message CFillPetFeed{
+	required string feedId = 1;
+	required int32	feedCount = 2;
+	required int32  storeKey = 3;
+	required int32	bowlOid = 4;
+	
+}
+message CClearPetFeed{
+	required int32  storeKey = 1;
+	required int32	bowlOid = 2;
+}
+message CPetEatFeed{
+	required int32 storeKey = 1;
+	required int32 bowlOid = 2;
+	
+}
+message CPetPlayWithObj{
+	required int32  storeKey = 1;
+	required int32	id = 2;
+}
+message CPetDressUp {
+	required int32 oid = 1;
+	repeated string parts = 2;
+	repeated bool fromInvens = 3;
+	repeated bool isWearing = 4;
+	required int32 storeKey = 5;
+	required int32 cost = 6;
+	required int32 cash = 7;
+}
+
+message CPetAdopt {
+	required string kind = 1;
+	required string name = 2;
+	required string gender = 3;
+}
+
+message CPetPut {
+	required int32 oid = 1;
+	required int32 price = 2;
+}
+
+message CPetCure {
+	required int32 oid = 1;
+	required int32 price = 2;
+	required bool isUseCash = 3;
+	required bool isImmediatelyCure = 4;
+}
+
+message CPetTake {
+	required int32 oid = 1;
+}
+
+message CPetPutSizeExpand {
+	required int32 price = 1;
+}
+
+message CPetChange {
+	required int32 time = 1;
+	optional int32 price = 2;
+}
+
+message CPetLearnSecondSkill {
+	required int32 oid = 1;
+}
+
+message CPetSkillChange {
+	required int32 oid = 1;
+	required int32 slotIndex = 2;
+}
+
+message CPetUseSkill {
+	required int32 storeKey = 1;
+	required int32 oid = 2;
+	required string skillId = 3;
+}
+
+message CPetUseSkillGetResource {
+	required int32 oid = 1;
+	required string skillId = 2;
+}
+
+message CPetUseSkillToutHint {
+	required int32 oid = 1;
+	required string skillId = 2;
+}
+
+message CUseCherryRoulette {
+	required bool useFree = 1;
+	required bool forced = 2;
+}
+message CBuyRouletteBean {
+	required int32 buffIndex = 1;
+}
+
+message CSetCalendarGMT {
+	required int32 GMT = 1;
+}
+
+message CUseJukebox {
+	required int32 storeKey = 1;
+	required bool use = 2;
+}
+
+message CRefreshDaisoItem{
+	required bool instant = 1;
+}
+
+message CBuyDaisoItem{
+	required string itemId = 1;
+}
+
+message CBuyOpenLuckyBox{
+	required string id = 1;
+}
+message CCherryRoasting{
+	required int32 oid = 1;
+	required string descId = 2;
+	required int32 storeKey = 3;
+}
+message  CCherryRoastFin {
+	required int32 oid = 1;
+	required bool oneClick = 2;
+	required int32 trashBean = 3;
+	required int32 storeKey = 4;
+	required string descId = 5;
+}
+message CCherryRoastRevive {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+	required string descId = 3;
+}
+message CCherryRoastShorten {
+	required int32 oid = 1;
+	required int32 leftSec = 2;
+	required int32 cash = 3;
+	required int32 storeKey = 4;
+	required string descId = 5;
+}
+
+message CThemaCollectionListPointGet {
+	required int32 order =1;
+	required string collectionId = 2;
+	required int32 collectionType = 3;
+}
+
+message CThemaCollectionRewardGet {
+	required string rewardIdList = 1;
+}
+
+message CThemaCollectionQuestCheck{
+}
+
+message CCherryRoastCancel {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+	required string descId = 3;
+}
+
+message CSpecialOrderClear{
+	required int32 idx = 1;
+}
+
+message CSpeicalOrderCancel{
+	required int32 idx = 1;
+}
+message CSpecialOrderRenew{
+	required int32 idx = 1;
+	required int32 needCash = 2;
+	required int32 remainTime = 3;
+}
+message CCashUseCashCheck{
+}
+message CCashUseRewardGet{
+	required int32 rowId =1;
+}
+
+message CSpecialPackage{
+}
+
+message CLvUpShopBuy {
+	required string shopKey=1;
+	required int32 idx = 2;
+	required int32 storeKey = 3;
+	required string itemId = 4;
+
+}
+message CLvUpShopPurchaseItemBuyCheck{
+	required string shopKey = 1;
+	required int32 idx = 2;
+}
+message CExpandTopFloor {
+	required int32 storeKey = 1;
+	required string expandId = 2;
+	required bool useCash = 3;
+	required int32 price = 4;
+}
+
+message CNewBingoMissionGet {
+	
+}
+message CNewPointMissionGet {
+}
+message CNewPointBoxGet{
+}
+message CNewGodOfManagerGet{
+}
+message COpenNewCoffeTruck{
+	required string id =1;
+	required bool useCash = 2;
+}
+
+message CCoffeeTruckGameFinish{
+	required string visitingId = 1;
+	required string blockTable = 2;
+	required string triggerTable = 3;
+	required string comboTable = 4;
+	required bool fever = 5;
+	required int32 score = 6;
+	required int32 customOrderPatron = 7;
+	required int32 customOrder = 8;
+}
+
+message GetCoffeeTruckGift{
+}
+
+message BuyCoffeeTruckShopItem{
+	required string id = 1;
+}
+
+message ChangeCftCustomerItem{
+	required string id = 1;
+}
+message CCoffeeTruckSpecialOrderManager{
+	required bool isTimeCheck = 1;
+}
+message CCoffeeTruckSpecialOrderFinish{
+	required int32 idx = 1;
+}
+message CCoffeeTruckSpecialOrderRenew{
+	required int32 idx = 1;
+}
+message CCoffeeTruckGameStart{
+}
+message CGetCoffeeTruckRanking{
+	required string uidList = 1;
+}
+message COpenLuckyBoxes{
+	required string id =1;
+	required int32 count = 2;
+}
+message CAutoTicketRoastingMachineStart{
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+	repeated string descId = 3;
+	repeated int32 count = 4;
+}
+message CAutoTicketRoastingMachineFin {
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}
+
+message CAutoTicketRoastingMachineShorten {
+	required int32 oid = 1;
+	required int32 cash = 2;
+	required int32 storeKey = 3;
+}
+
+message CAutoTicketRoastingMachineRevive{
+	required int32 oid = 1;
+	required int32 storeKey = 2;
+}

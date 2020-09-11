@@ -1,0 +1,48 @@
+package Network.packet;
+
+
+option java_outer_classname = "Session";
+
+
+message CLoginReq {
+	required string userid = 1;
+	optional string name = 2;
+	optional string email = 3;
+	optional string token = 4;
+	optional int32 stamp = 5;
+
+	required string binVer = 6;
+	required string dataVer = 7;
+	required string market = 8;
+	optional int32 sessionKey = 9;
+	optional int32 recvCounter = 10;
+
+	repeated string parts = 11;
+	optional bool cancelUnregister = 12;	
+	
+	optional string os = 13;
+}
+
+message SLoginRes {
+	required LoginResult res = 1;
+	optional int32 encKey = 2;
+	optional int32 sessionKey = 3;
+	optional int32 sentCounter = 4;
+	optional string json = 5;
+	optional int32 termsAgreementVer = 6;
+}
+
+enum LoginResult {
+	Success = 0;
+	NoAccount = 1;
+	AuthFail = 2;
+	NeedPatch = 3;
+	RestartSession = 4;
+	UnknownError = 5;
+	InvalidAccess = 6;
+	Blocked = 7;
+	UnregistrationInProgress = 8;
+	TokenExpired = 9;
+	RelocateServer = 10;
+	DualConnect = 11;
+}
