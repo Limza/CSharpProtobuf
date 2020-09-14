@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using Google.Protobuf;
@@ -15,9 +17,50 @@ public class NetworkMgr : Singleton<NetworkMgr>
     string status;
     string uid;
 
-    public void Connect(string uid)
+    public void Init(string uid)
     {
         this.uid = uid;
+        StartCoroutine(this.serverUpdate());
+    }
+
+    public void Write(in Network.ProtocolCode protocolCode, IMessage msg)
+    {
+        // TODO: 로그인 요청 아닐경우 구현 필요
+
+        var p = new Network.ClientMessage();
+        p.Payload = msg.ToByteString();
+        p.PacketId = 0;
+        p.Pcode = protocolCode;
+        var pkt = p.ToByteString();
+        this.send(pkt, p.PacketId);
+    }
+
+    IEnumerator serverUpdate()
+    {
+        // 접속이 끊겨도 계속 시도
+        while (true)
+        {
+            this.connect();
+            this.requestLogin();
+
+            while (true)
+            {
+                yield return new WaitForEndOfFrame();
+                this.receive(4, out byte[] lenBuffer);
+                if (BitConverter.IsLittleEndian)
+                    Array.Reverse(lenBuffer);
+                var len = BitConverter.ToInt32(lenBuffer, 0);
+                
+                this.receive(len, out byte[] dataBuffer);
+                var receiveData = Network.ServerMessage.Parser.ParseFrom(dataBuffer);
+                var loginData = Network.Packet.SLoginRes.Parser.ParseFrom(receiveData.Payload);
+                Debug.Log(loginData);
+            }
+        }
+    }
+
+    void connect()
+    {
         var endPoint = new IPEndPoint(IPAddress.Parse(this.serverIp), this.serverPort);
 
         // 계속 접속 시도
@@ -41,8 +84,6 @@ public class NetworkMgr : Singleton<NetworkMgr>
                     break;
             }
         }
-
-        this.requestLogin();
     }
 
     void requestLogin()
@@ -53,25 +94,12 @@ public class NetworkMgr : Singleton<NetworkMgr>
             BinVer = "?",
             DataVer = "166214_22116",
             Market = "DEV",
-            Name = "patitest",
-            Os = "Windows",
-            Stamp = 1599189634,
-            Token = "b99addc465bb614a6abd8763c1d32c4cbcaca7c4e783446835e70db92b0deff3"
+            // Os = "Windows",
+            // Stamp = 1599189634,
+            // Token = "b99addc465bb614a6abd8763c1d32c4cbcaca7c4e783446835e70db92b0deff3"
         };
 
         this.Write(Network.ProtocolCode.CLoginReq, msg);
-    }
-
-    public void Write(in Network.ProtocolCode protocolCode, IMessage msg)
-    {
-        // TODO: 로그인 요청 아닐경우 구현 필요
-
-        var p = new Network.ClientMessage();
-        p.Payload = msg.ToByteString();
-        p.PacketId = 0;
-        p.Pcode = protocolCode;
-        var pkt = p.ToByteString();
-        this.send(pkt, p.PacketId);
     }
 
     void send(Google.Protobuf.ByteString pkt, in int packetId)
@@ -97,43 +125,47 @@ public class NetworkMgr : Singleton<NetworkMgr>
         Array.Copy(pktByte, 0, sendByte, lenByte.Length, pktByte.Length);
 
         this.socket.Send(sendByte);
-
-        this.receive(4, out byte[] buffer);
-        
-        // TODO : 임시로 리시브에서 모든 데이터 받은걸 가정
-        var lenBuffer = new byte[4];
-        Array.Copy(buffer, lenBuffer, 4);
-        if (BitConverter.IsLittleEndian)
-            Array.Reverse(lenBuffer);
-        var len = BitConverter.ToInt32(lenBuffer, 0);
-        
-        var dataBuffer = new byte[len];
-        Array.Copy(buffer, 4, dataBuffer, 0, len);
-
-        var receiveData = Network.ServerMessage.Parser.ParseFrom(dataBuffer);
-
-        var loginData = Network.Packet.SLoginRes.Parser.ParseFrom(receiveData.Payload);
-        Debug.Log(loginData);
     }
 
-    bool receive(in int len, out byte[] buffer)
+    byte[] receiveBuffer = null;
+    bool receive(in int len, out byte[] outBuffer)
     {
-        buffer = new byte[1024];
-        try
+        outBuffer = new byte[len];
+        // len의 길이만큼 out 버퍼를 채원준다
+        while (this.receiveBuffer == null || this.receiveBuffer.Length < len)
         {
-            int byteCount = this.socket.Receive(buffer);
-            if (byteCount > 0)
+            var tempBuffer = new byte[1024];
+            try
             {
-                // TODO : 임시로 바로 넣어줌, 원래는 while문을 타서 len까지 버퍼를 받아야 한다
+                int byteCount = this.socket.Receive(tempBuffer);
+                if (byteCount > 0)
+                {
+                    if (this.receiveBuffer == null)
+                    {
+                        this.receiveBuffer = new byte[byteCount];
+                        Array.Copy(tempBuffer, 0, this.receiveBuffer, 0, byteCount);
+                    }
+                    else
+                    {
+                        var oldBuffer = this.receiveBuffer;
+                        this.receiveBuffer = new byte[oldBuffer.Length + byteCount];
+                        oldBuffer.CopyTo(this.receiveBuffer, 0);
+                        tempBuffer.CopyTo(this.receiveBuffer, oldBuffer.Length);
+                    }
+                }
+            }
+            catch (SocketException e)
+            {
+                this.receiveBuffer = null;
+                Debug.Log(e.Message);
+                return false;
             }
         }
-        catch (SocketException e)
-        {
-            Debug.Log(e.Message);
-            return false;
-        }
 
-        Debug.Log(buffer.ToString());
+        Array.Copy(this.receiveBuffer, 0, outBuffer, 0, len);
+        var receiveBufferList = this.receiveBuffer.ToList();
+        receiveBufferList.RemoveRange(0, len);
+        this.receiveBuffer = receiveBufferList.ToArray();
         return true;
     }
 }
