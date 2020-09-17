@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -12,15 +13,83 @@ public class NetworkMgr : Singleton<NetworkMgr>
 {
     public string serverIp = "127.0.0.1";
     public int serverPort = 3927;
-    Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     
+    bool isConnect = false;
     string status;
-    string uid;
+    string uid, nick;
+    AsynchronousClient asyncClient;
+    List<byte> receiveBufferList = new List<byte>();
+    Coroutine msgTranslateCo;
 
-    public void Init(string uid)
+    public void Init(in string uid, in string nick)
     {
         this.uid = uid;
-        StartCoroutine(this.serverUpdate());
+        this.nick = nick;
+
+        this.startAsyncClient();
+    }
+
+    void startAsyncClient()
+    {
+        this.asyncClient = new AsynchronousClient(new IPEndPoint(IPAddress.Parse(this.serverIp), this.serverPort));
+        this.status = "connecting " + this.asyncClient.ConnectCount.ToString();
+        
+        this.asyncClient.ConnectCallback = (data, error) => {
+            if (SocketError.Success == error)
+            {
+                this.isConnect = true;
+                this.requestLogin();
+                this.msgTranslateCo = StartCoroutine(this.msgTranslate());
+            }
+            else
+                this.status = "connecting " + this.asyncClient.ConnectCount.ToString();
+        };
+        
+        this.asyncClient.ReceiveCallback = (data, error) => {
+            if (this.asyncClient == null || SocketError.Success != error)
+            {
+                Debug.Log(error);
+                this.reStart();
+                return;
+            }
+            this.receiveBufferList.AddRange(data);
+        };
+
+        this.asyncClient.Start();
+    }
+
+    void requestLogin()
+    {
+        this.status = "logging in";
+        var msg = new Network.Packet.CLoginReq();
+        msg.Userid = this.uid;
+        
+        msg.BinVer = "?";
+        msg.DataVer = "166214_22116";
+        msg.Market = "DEV";
+        // msg.Os = "Windows";
+        // msg.Stamp = 1599189634;
+        // msg.Token = "b99addc465bb614a6abd8763c1d32c4cbcaca7c4e783446835e70db92b0deff3";
+
+        this.Write(Network.ProtocolCode.CLoginReq, msg);
+    }
+
+    void reStart()
+    {
+        if (this.isConnect)
+        {
+            this.isConnect = false;
+            this.receiveBufferList.Clear();
+            
+            if (this.msgTranslateCo != null)
+                StopCoroutine(this.msgTranslateCo);
+            this.msgTranslateCo = null;
+            
+            this.asyncClient.Close();
+            this.asyncClient = null;
+            
+            this.startAsyncClient();
+        }
     }
 
     public void Write(in Network.ProtocolCode protocolCode, IMessage msg)
@@ -31,141 +100,60 @@ public class NetworkMgr : Singleton<NetworkMgr>
         p.Payload = msg.ToByteString();
         p.PacketId = 0;
         p.Pcode = protocolCode;
-        var pkt = p.ToByteString();
-        this.send(pkt, p.PacketId);
+        this.send(p.ToByteArray(), p.PacketId);
     }
 
-    IEnumerator serverUpdate()
+    void send(byte[] pktByte, in int packetId)
     {
-        // 접속이 끊겨도 계속 시도
-        while (true)
-        {
-            this.connect();
-            this.requestLogin();
-
-            while (true)
-            {
-                yield return new WaitForEndOfFrame();
-                this.receive(4, out byte[] lenBuffer);
-                if (BitConverter.IsLittleEndian)
-                    Array.Reverse(lenBuffer);
-                var len = BitConverter.ToInt32(lenBuffer, 0);
-                
-                this.receive(len, out byte[] dataBuffer);
-                var receiveData = Network.ServerMessage.Parser.ParseFrom(dataBuffer);
-                var loginData = Network.Packet.SLoginRes.Parser.ParseFrom(receiveData.Payload);
-                Debug.Log(loginData);
-            }
-        }
-    }
-
-    void connect()
-    {
-        var endPoint = new IPEndPoint(IPAddress.Parse(this.serverIp), this.serverPort);
-
-        // 계속 접속 시도
-        var connectCount = 0;
-        while (true)
-        {
-            try
-            {
-                socket.Connect(endPoint);
-            }
-            catch (SocketException e)
-            {
-                if (e.SocketErrorCode == SocketError.TimedOut)
-                {
-                    connectCount++;
-                    this.status = "connecting " + connectCount.ToString();
-                }
-                else if (e.SocketErrorCode == SocketError.ConnectionRefused)
-                    this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                else if (e.SocketErrorCode == SocketError.IsConnected)
-                    break;
-            }
-        }
-    }
-
-    void requestLogin()
-    {
-        this.status = "logging in";
-        var msg = new Network.Packet.CLoginReq{
-            Userid = this.uid,
-            BinVer = "?",
-            DataVer = "166214_22116",
-            Market = "DEV",
-            // Os = "Windows",
-            // Stamp = 1599189634,
-            // Token = "b99addc465bb614a6abd8763c1d32c4cbcaca7c4e783446835e70db92b0deff3"
-        };
-
-        this.Write(Network.ProtocolCode.CLoginReq, msg);
-    }
-
-    void send(Google.Protobuf.ByteString pkt, in int packetId)
-    {
-        if (this.socket == null)
+        if (this.asyncClient == null)
         {
             // TODO: socket null일때 예외처리
+            this.reStart();
             return;
         }
 
-        // >i4 == 빅엔디안 인티져 4바이트 압축
-        // >I1 == 빅엔디안 언사인드 인티져 1바이트 압축
-
-        var pktByte = pkt.ToByteArray();
         var lenByte = BitConverter.GetBytes(pktByte.Length);
         if (BitConverter.IsLittleEndian)
             Array.Reverse(lenByte);
-        
-        BitConverter.ToInt32(lenByte, 0);
 
-        var sendByte = new byte[lenByte.Length + pktByte.Length];
-        Array.Copy(lenByte, 0, sendByte, 0, lenByte.Length);
-        Array.Copy(pktByte, 0, sendByte, lenByte.Length, pktByte.Length);
+        List<byte> sendByteList = new List<byte>();
+        sendByteList.AddRange(lenByte);
+        sendByteList.AddRange(pktByte);
 
-        this.socket.Send(sendByte);
+        this.asyncClient.Send(sendByteList.ToArray());
     }
 
-    byte[] receiveBuffer = null;
-    bool receive(in int len, out byte[] outBuffer)
+    int msgLen = 0;
+    IEnumerator msgTranslate()
     {
-        outBuffer = new byte[len];
-        // len의 길이만큼 out 버퍼를 채원준다
-        while (this.receiveBuffer == null || this.receiveBuffer.Length < len)
+        // TODO : 데이터를 읽는 과정에서, msgLen이 문제가 있거나, Parser에 문제가 있다면,
+        // 그 즉시 모든 receive 받은 패킷들을 패기하고, 후속 조치를 취해야 한다
+        // ex) 게임을 재시작 한다거나, 이전 receive패킷들은 무시해버리는 식으로
+        while (true)
         {
-            var tempBuffer = new byte[1024];
-            try
-            {
-                int byteCount = this.socket.Receive(tempBuffer);
-                if (byteCount > 0)
-                {
-                    if (this.receiveBuffer == null)
-                    {
-                        this.receiveBuffer = new byte[byteCount];
-                        Array.Copy(tempBuffer, 0, this.receiveBuffer, 0, byteCount);
-                    }
-                    else
-                    {
-                        var oldBuffer = this.receiveBuffer;
-                        this.receiveBuffer = new byte[oldBuffer.Length + byteCount];
-                        oldBuffer.CopyTo(this.receiveBuffer, 0);
-                        tempBuffer.CopyTo(this.receiveBuffer, oldBuffer.Length);
-                    }
-                }
-            }
-            catch (SocketException e)
-            {
-                this.receiveBuffer = null;
-                Debug.Log(e.Message);
-                return false;
-            }
-        }
+            yield return new WaitForEndOfFrame();
 
-        Array.Copy(this.receiveBuffer, 0, outBuffer, 0, len);
-        var receiveBufferList = this.receiveBuffer.ToList();
-        receiveBufferList.RemoveRange(0, len);
-        this.receiveBuffer = receiveBufferList.ToArray();
-        return true;
+            if (this.msgLen == 0)
+            {
+                if (this.receiveBufferList.Count < 4)
+                    continue;
+                var lenBuffer = this.receiveBufferList.GetRange(0, 4).ToArray();
+                this.receiveBufferList.RemoveRange(0, 4);
+                if (BitConverter.IsLittleEndian)
+                    Array.Reverse(lenBuffer);
+                this.msgLen = BitConverter.ToInt32(lenBuffer, 0);
+            }
+
+            if (this.receiveBufferList.Count < this.msgLen)
+                continue;
+            var dataBuffer = this.receiveBufferList.GetRange(0, this.msgLen).ToArray();
+            this.receiveBufferList.RemoveRange(0, this.msgLen);
+
+            var receiveData = Network.ServerMessage.Parser.ParseFrom(dataBuffer);
+            var loginData = Network.Packet.SLoginRes.Parser.ParseFrom(receiveData.Payload);
+            Debug.Log(loginData);
+
+            this.msgLen = 0;
+        }
     }
 }
